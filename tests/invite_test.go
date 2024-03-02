@@ -130,4 +130,5 @@ func (s *InviteTestSuite) TestMultipleParalleInviteRegistrationsSuccess() {
 		}()
 	}
 
+	wg.Wait()
 }
