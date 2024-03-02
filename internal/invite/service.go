@@ -26,6 +26,12 @@ func NewInviteService(cl *mongo.Client) *InviteService {
 }
 
 func (s *InviteService) RegisterInvite(ctx context.Context, invite Invite) error {
-	s.db.Collection(fmt.Sprintf("code-%s", invite.Code)).InsertOne(ctx, InviteModel{Email: invite.Email, RegisteredAt: invite.RegisteredAt})
+	res, err := s.db.Collection(fmt.Sprintf("code-%s", invite.Code)).
+		InsertOne(ctx, InviteModel{Email: invite.Email, RegisteredAt: invite.RegisteredAt})
+
+	if err != nil {
+		return err
+	}
+	_ = res
 	return nil
 }

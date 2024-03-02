@@ -3,6 +3,8 @@ package invite
 import (
 	"context"
 	"net/mail"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -20,7 +22,7 @@ type Handler struct {
 }
 
 type IInviteService interface {
-	RegisterInvite(ctx context.Context, email string) error
+	RegisterInvite(ctx context.Context, invite Invite) error
 }
 
 func NewHandler(inviteService IInviteService) *Handler {
@@ -31,17 +33,24 @@ func NewHandler(inviteService IInviteService) *Handler {
 
 func (h *Handler) registerInvite(c echo.Context) error {
 	req := new(InviteRequest)
-	c.Bind(req)
-
-	_, err := mail.ParseAddress(req.Email)
+	err := c.Bind(&req)
 	if err != nil {
-		log.Error().Err(err).Msg("invalid email passed")
+		log.Error().Err(err).Msg("failed to bind request")
 		return nil
 	}
 
-	//todo add invite code
+	_, err = mail.ParseAddress(req.Email)
+	if err != nil {
+		log.Error().Err(err).Msgf("invalid email passed %v", req)
+		return nil
+	}
 
-	return h.inviteService.RegisterInvite(context.TODO(), Invite{Code:})
+	if strings.TrimSpace(req.Code) == "" {
+		log.Error().Msgf("code is blank %v", req)
+		return nil
+	}
+
+	return h.inviteService.RegisterInvite(context.TODO(), Invite{Code: req.Code, Email: req.Email, RegisteredAt: time.Now()})
 }
 
 func (h *Handler) Register(e *echo.Echo) {
