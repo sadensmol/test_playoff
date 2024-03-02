@@ -31,10 +31,12 @@ func (s *IntegrationTest) Setup() {
 	s.Cfg = config.Config{
 		HTTP: config.HTTP{Port: httpPort},
 		Mongo: config.Mongo{
-			Host:     "localhost",
-			Port:     27017,
-			User:     "mongo",
-			Password: "mongo",
+			Host:          "localhost",
+			Port:          27017,
+			User:          "mongo",
+			Password:      "mongo",
+			AdminDatabase: "admin",
+			MaxPoolSize:   100,
 		},
 	}
 

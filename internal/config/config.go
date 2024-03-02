@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/codingconcepts/env"
@@ -17,10 +18,22 @@ type HTTP struct {
 }
 
 type Mongo struct {
-	Host     string `env:"MONGODB_HOST"`
-	Port     int    `env:"MONGODB_PORT"`
-	User     string `env:"MONGODB_USER"`
-	Password string `env:"MONGODB_PASSWORD"`
+	Host          string `env:"MONGODB_HOST"`
+	Port          int    `env:"MONGODB_PORT"`
+	User          string `env:"MONGODB_USER"`
+	AdminDatabase string `env:"MONGODB_ADMIN_DATABASE"`
+	Password      string `env:"MONGODB_PASSWORD"`
+	MaxPoolSize   int    `env:"MONGODB_MAX_POOL_SIZE"`
+}
+
+func (m Mongo) ConnectionString() string {
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s?maxPoolSize=%d&connectTimeoutMS=5000&socketTimeoutMS=5000",
+		m.User,
+		m.Password,
+		m.Host,
+		m.Port,
+		m.AdminDatabase,
+		m.MaxPoolSize)
 }
 
 var once sync.Once

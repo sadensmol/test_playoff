@@ -3,6 +3,7 @@ package invite
 import "time"
 
 type Invite struct {
-	Email        string `json:"email"`
+	Code         string
+	Email        string
 	RegisteredAt time.Time
 }
