@@ -54,5 +54,5 @@ func (h *Handler) registerInvite(c echo.Context) error {
 }
 
 func (h *Handler) Register(e *echo.Echo) {
-	e.POST("/invite", h.registerInvite)
+	e.POST("/api/v1/invite", h.registerInvite)
 }

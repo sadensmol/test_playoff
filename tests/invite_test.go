@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	testCode = "test-code"
+	testCode  = "test-code"
+	inviteURL = "/api/v1/invite"
 )
 
 type InviteTestSuite struct {
@@ -36,6 +37,7 @@ func (s *InviteTestSuite) TearDownSuite() {
 }
 
 func TestIntAPITestSuite(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(InviteTestSuite))
 }
 
@@ -47,7 +49,7 @@ func (s *InviteTestSuite) TestInviteRegistrationSuccess() {
 	testEmail := fmt.Sprintf("test-%s@test.com", rndStr)
 	apitest.New().
 		EnableNetworking().
-		Post(s.BaseURL() + "/invite").
+		Post(s.BaseURL() + inviteURL).
 		ContentType("application/json").
 		Body(fmt.Sprintf(`{"email":"%s","code":"%s"}`, testEmail, testCode)).
 		Expect(s.T()).
@@ -64,7 +66,12 @@ func (s *InviteTestSuite) TestInviteRegistrationSuccess() {
 	s.NoError(err)
 
 	s.Equal(testEmail, invite.Email)
-	s.True(invite.RegisteredAt.After(startTime) && invite.RegisteredAt.Before(time.Now()))
+	endTime := time.Now()
+
+	regAtTime := invite.RegisteredAt.Unix()
+
+	s.True(regAtTime >= startTime.Unix() && regAtTime <= endTime.Unix(),
+		"RegisteredAt %v is not in the range %v - %v", invite.RegisteredAt, startTime, endTime)
 }
 
 func (s *InviteTestSuite) TestInviteRegistrationWrongEmailSkipped() {
@@ -74,7 +81,7 @@ func (s *InviteTestSuite) TestInviteRegistrationWrongEmailSkipped() {
 	testEmail := fmt.Sprintf("test-%s@test.com", rndStr)
 	apitest.New().
 		EnableNetworking().
-		Post(s.BaseURL() + "/invite").
+		Post(s.BaseURL() + inviteURL).
 		ContentType("application/json").
 		Body(fmt.Sprintf(`{"email":"some_wrong_email","code":"%s"}`, testCode)).
 		Expect(s.T()).
@@ -95,7 +102,7 @@ func (s *InviteTestSuite) TestInviteRegistrationBlankCodeSkipped() {
 	emptyCode := "  "
 	apitest.New().
 		EnableNetworking().
-		Post(s.BaseURL() + "/invite").
+		Post(s.BaseURL() + inviteURL).
 		ContentType("application/json").
 		Body(fmt.Sprintf(`{"email":"%s","code":"%s"}`, testEmail, emptyCode)).
 		Expect(s.T()).
@@ -118,7 +125,7 @@ func (s *InviteTestSuite) TestMultipleParalleInviteRegistrationsSuccess() {
 		go func() {
 			apitest.New().
 				EnableNetworking().
-				Post(s.BaseURL() + "/invite").
+				Post(s.BaseURL() + inviteURL).
 				ContentType("application/json").
 				Body(fmt.Sprintf(`{"email":"%s", "code":"%s"}`, testEmail, testCode)).
 				Expect(s.T()).

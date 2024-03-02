@@ -112,11 +112,31 @@ Response: 
 
 # Как все это запустить?
 
+чтобы запустить приложение в докере вместе в БД (go 1.22) :
+
 ```bash
 make run
 ```
 
+далее делаем запросы на сервер:
+
+```curl
+
+curl -X POST http://localhost:8080/api/v1/invite \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "test3@email.com",
+  "code": "test-code-2"
+}'
+```
+
+далее идем в базу и смотри что появились записи (admin:pass):
+
+http://localhost:8081/db/invites/
+
 # Как запустить тесты?
+
+чтобы выполнить тесты неоходимо поднять docker с окружением и выполнить тесты:
 
 ```bash
 make down
