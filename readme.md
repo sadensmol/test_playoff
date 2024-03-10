@@ -154,3 +154,10 @@ make test
 - liveness/readiness endpoints для zero downtime
 
 - дальше проходимся по пункту "Проблемы и решения" и решаем проблемы :).
+
+
+# Feedback from the team
+
+<p align="left">
+ <img width="500px" src="assets/feedback.png"/>
+</p>
